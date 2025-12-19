@@ -12,16 +12,70 @@
 }
 
 .nav-item {
+  position: relative;
+}
+
+.nav-item-button {
   background: none;
   border: none;
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
-  cursor: default;
+  cursor: pointer;
   padding: 1rem 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.nav-item-button:hover {
+  color: #ffd700;
+}
+
+.nav-item-button svg {
+  transition: transform 0.2s;
+}
+
+.nav-item:hover .nav-item-button svg,
+.nav-item-button[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.dropdown-menu button:hover {
+  background-color: #3a3a3a;
+}
+
+.dropdown-menu button:first-child {
+  border-radius: 3px 3px 0 0;
+}
+
+.dropdown-menu button:last-child {
+  border-radius: 0 0 3px 3px;
 }
 

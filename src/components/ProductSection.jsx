@@ -1,84 +1,149 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useCart } from '../contexts/CartContext'
+import { api } from '../api/mockApi'
 import './ProductSection.css'
 
 function ProductSection() {
-  const products = [
-    {
-      id: 1,
-      name: "Volante Esportivo",
-      originalPrice: 1600,
-      currentPrice: 800,
-      discount: 50,
-      image: "steering-wheel"
-    },
-    {
-      id: 2,
-      name: "Kit Intake + Filtro K&N",
-      originalPrice: 700,
-      currentPrice: 600,
-      discount: 14,
-      image: "intake-kit"
-    },
-    {
-      id: 3,
-      name: "Aerofólio EM1 para",
-      originalPrice: 750,
-      currentPrice: 600,
-      discount: 20,
-      image: "aerofoil"
-    },
-    {
-      id: 4,
-      name: "Aerofólio Honda civic",
-      originalPrice: 400,
-      currentPrice: 200,
-      discount: 50,
-      image: "aerofoil-civic"
-    },
-    {
-      id: 5,
-      name: "Aerofólio Honda civic",
-      originalPrice: 400,
-      currentPrice: 200,
-      discount: 50,
-      image: "aerofoil-civic-2"
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const { addItem } = useCart()
+
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true)
+      const data = await api.getProducts()
+      setProducts(data)
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product)
+  }
+
+  const closeProductDetails = () => {
+    setSelectedProduct(null)
+  }
+
+  const handleAddToCart = (product) => {
+    addItem(product)
+    alert(`✅ ${product.name} adicionado ao carrinho!`)
+  }
+
+  if (loading) {
+    return (
+      <section className="product-section">
+        <div className="product-container">
+          <h2 className="product-section-title">
+            <span>NOSSOS PRODUTOS</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.5 2.5a2.121 2.121 0 0 1 3 3L6.5 19.5l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </h2>
+          <div className="loading">Carregando produtos...</div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="product-section">
       <div className="product-container">
         <h2 className="product-section-title">
-          <span>MELHORES OFERTAS</span>
+          <span>NOSSOS PRODUTOS</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M17.5 2.5a2.121 2.121 0 0 1 3 3L6.5 19.5l-4 1 1-4L16.5 3.5z"/>
           </svg>
         </h2>
         <div className="products-grid">
-          {products.map(product => (
-            <div key={product.id} className="product-card">
-              <div className="product-image">
-                <div className="product-image-placeholder">
-                  {product.image}
+          {products.length === 0 ? (
+            <div className="no-products">Nenhum produto disponível no momento.</div>
+          ) : (
+            products.map(product => (
+              <div
+                key={product.id}
+                className="product-card"
+                onClick={() => handleProductClick(product)}
+                style={{ cursor: 'pointer' }}
+              >
+                {product.imgUrl && (
+                  <div className="product-image">
+                    <img src={product.imgUrl} alt={product.name} />
+                  </div>
+                )}
+                <div className="product-info">
+                  <div className="product-price">
+                    R$ {product.price.toFixed(2)}
+                  </div>
+                  <div className="product-name">
+                    {product.name}
+                  </div>
+                  {product.description && (
+                    <div className="product-description">
+                      {product.description.length > 100
+                        ? product.description.substring(0, 100) + '...'
+                        : product.description}
+                    </div>
+                  )}
+                  <div className="product-click-hint">
+                    Clique para ver detalhes
+                  </div>
                 </div>
               </div>
-              <div className="product-info">
-                <div className="product-prices">
-                  <span className="product-original-price">R${product.originalPrice.toFixed(2)}</span>
-                  <span className="product-current-price">R${product.currentPrice.toFixed(2)}</span>
-                  <span className="product-discount">{product.discount}% OFF</span>
-                </div>
-                <div className="product-shipping">
-                  <span className="free-shipping">Frete grátis</span>
-                </div>
-                <div className="product-name">
-                  {product.name}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
+
+      {selectedProduct && (
+        <div className="product-details-overlay" onClick={closeProductDetails}>
+          <div className="product-details-modal" onClick={e => e.stopPropagation()}>
+            <div className="product-details-header">
+              <h3>{selectedProduct.name}</h3>
+              <button className="close-button" onClick={closeProductDetails}>×</button>
+            </div>
+
+            {selectedProduct.imgUrl && (
+              <div className="product-details-image">
+                <img src={selectedProduct.imgUrl} alt={selectedProduct.name} />
+              </div>
+            )}
+
+            <div className="product-details-info">
+              <div className="product-details-price">
+                R$ {selectedProduct.price.toFixed(2)}
+              </div>
+
+              {selectedProduct.description && (
+                <div className="product-details-description">
+                  <h4>Descrição:</h4>
+                  <p>{selectedProduct.description}</p>
+                </div>
+              )}
+
+              <div className="product-details-actions">
+                <button
+                  className="add-to-cart-button"
+                  onClick={() => handleAddToCart(selectedProduct)}
+                >
+                  🛒 Adicionar ao Carrinho
+                </button>
+                <button className="wishlist-button">
+                  Adicionar à Lista de Desejos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

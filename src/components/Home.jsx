@@ -3,10 +3,10 @@ import Navigation from './Navigation'
 import HeroBanner from './HeroBanner'
 import ProductSection from './ProductSection'
 
-function Home() {
+function Home({ onNavigateToCategory }) {
   return (
     <>
-      <Navigation />
+      <Navigation onNavigateToCategory={onNavigateToCategory} />
       <HeroBanner />
       <ProductSection />
     </>
