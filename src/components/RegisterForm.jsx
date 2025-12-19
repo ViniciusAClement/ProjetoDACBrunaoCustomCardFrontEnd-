@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { api } from '../api/mockApi'
 import './RegisterForm.css'
-
+// tenho que arrumar a integração com backend depois//
 function RegisterForm({ onBack }) {
   const [formData, setFormData] = useState({
     name: '',
